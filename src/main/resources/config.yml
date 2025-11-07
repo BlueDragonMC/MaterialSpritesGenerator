@@ -1,0 +1,10 @@
+template: MaterialSprites.template.java
+output: MaterialSprites.java
+package: fr.theoszanto.mc.generated
+stop-server-after-generation: true
+atlases:
+  - blocks
+  - decorated_pot
+  - gui
+  - map_decorations
+  - particles

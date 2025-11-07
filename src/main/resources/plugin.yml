@@ -1,0 +1,9 @@
+name: MaterialSpritesGenerator
+version: "${project.version}"
+main: fr.theoszanto.mc.materialspritesgenerator.MaterialSpritesGenerator
+api-version: "1.21.10"
+author: indyteo
+commands:
+  sprites:
+    aliases: [ sprite ]
+    description: "Show sprites"
