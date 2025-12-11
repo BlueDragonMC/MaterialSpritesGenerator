@@ -1,7 +1,7 @@
 name: MaterialSpritesGenerator
 version: "${project.version}"
 main: fr.theoszanto.mc.materialspritesgenerator.MaterialSpritesGenerator
-api-version: "1.21.10"
+api-version: "1.21.11"
 author: indyteo
 commands:
   sprites:

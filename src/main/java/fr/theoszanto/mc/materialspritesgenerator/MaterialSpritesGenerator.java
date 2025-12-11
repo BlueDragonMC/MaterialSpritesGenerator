@@ -116,6 +116,8 @@ public class MaterialSpritesGenerator extends JavaPlugin {
 	private static final String ITEM = MINECRAFT + "item/";
 	private static final String BLOCK = MINECRAFT + "block/";
 
+	private static final String ITEMS_ATLAS = "items";
+
 	private static final List<MappingRule> RULES = List.of(
 			//<editor-fold desc="Mapping rules">
 			rule().suffix("air").overwrite("NOTHING").code().resolved(Component.text("  ")),
@@ -145,8 +147,8 @@ public class MaterialSpritesGenerator extends JavaPlugin {
 
 			rule().exact(Material.WATER).prepend(BLOCK).append("_still").sprite().color(TextColor.color(0x3F76E4)),
 			rule().exact(Material.LAVA).prepend(BLOCK).append("_still").sprite(),
-			rule().exact(Material.TRIPWIRE).overwrite(ITEM + "string").sprite(),
-			rule().exact(Material.LIGHT).prepend(ITEM).append("_15").sprite(),
+			rule().exact(Material.TRIPWIRE).overwrite(ITEM + "string").sprite().atlas(ITEMS_ATLAS),
+			rule().exact(Material.LIGHT).prepend(ITEM).append("_15").sprite().atlas(ITEMS_ATLAS),
 			rule().either(Material.FIRE, Material.SOUL_FIRE, Material.SUSPICIOUS_GRAVEL, Material.SUSPICIOUS_SAND).prepend(BLOCK).append("_0").sprite(),
 			rule().suffix("anvil").prepend(BLOCK).append("_top").sprite(),
 			rule().suffix("_dripleaf").prepend(BLOCK).append("_top").sprite(),
@@ -159,8 +161,8 @@ public class MaterialSpritesGenerator extends JavaPlugin {
 			rule().exact(Material.TRIAL_SPAWNER).prepend(BLOCK).append("_side_inactive").sprite(),
 			rule().exact(Material.VAULT).prepend(BLOCK).append("_front_off").sprite(),
 			rule().exact(Material.TEST_BLOCK).prepend(BLOCK).append("_start").sprite(),
-			rule().exact(Material.COCOA).prepend(ITEM).append("_beans").sprite(),
-			rule().exact(Material.CROSSBOW).prepend(ITEM).append("_standby").sprite(),
+			rule().exact(Material.COCOA).prepend(ITEM).append("_beans").sprite().atlas(ITEMS_ATLAS),
+			rule().exact(Material.CROSSBOW).prepend(ITEM).append("_standby").sprite().atlas(ITEMS_ATLAS),
 			rule().exact(Material.CHISELED_BOOKSHELF).prepend(BLOCK).append("_occupied").sprite(),
 			rule().exact(Material.CALIBRATED_SCULK_SENSOR).prepend(BLOCK).append("_input_side").sprite(),
 			rule().regex("smooth_quartz(_slab|_stairs)?").overwrite(BLOCK + "quartz_block_bottom").sprite(),
@@ -174,13 +176,13 @@ public class MaterialSpritesGenerator extends JavaPlugin {
 			rule().either(Material.PISTON_HEAD, Material.MOVING_PISTON).overwrite(BLOCK + "piston_top").sprite(),
 			rule().exact(Material.STICKY_PISTON).overwrite(BLOCK + "piston_top_sticky").sprite(),
 			rule().exact(Material.PETRIFIED_OAK_SLAB).overwrite(BLOCK + "oak_planks").sprite(),
-			rule().exact(Material.DEBUG_STICK).overwrite(ITEM + "stick").sprite(),
-			rule().exact(Material.ENCHANTED_GOLDEN_APPLE).overwrite(ITEM + "golden_apple").sprite(),
-			rule().exact(Material.TIPPED_ARROW).overwrite(ITEM + "arrow").sprite(),
+			rule().exact(Material.DEBUG_STICK).overwrite(ITEM + "stick").sprite().atlas(ITEMS_ATLAS),
+			rule().exact(Material.ENCHANTED_GOLDEN_APPLE).overwrite(ITEM + "golden_apple").sprite().atlas(ITEMS_ATLAS),
+			rule().exact(Material.TIPPED_ARROW).overwrite(ITEM + "arrow").sprite().atlas(ITEMS_ATLAS),
 			rule().exact(Material.BAMBOO_SAPLING).overwrite(BLOCK + "bamboo_stage0").sprite(),
 			rule().exact(Material.DRIED_KELP_BLOCK).overwrite(BLOCK + "dried_kelp_side").sprite(),
 			rule().exact(Material.LECTERN).overwrite(BLOCK + "bookshelf").sprite(),
-			rule().either(Material.LAVA_CAULDRON, Material.POWDER_SNOW_CAULDRON, Material.WATER_CAULDRON).overwrite(ITEM + "cauldron").sprite(),
+			rule().either(Material.LAVA_CAULDRON, Material.POWDER_SNOW_CAULDRON, Material.WATER_CAULDRON).overwrite(ITEM + "cauldron").sprite().atlas(ITEMS_ATLAS),
 			rule().exact(Material.DECORATED_POT).overwrite(MINECRAFT + "entity/decorated_pot/danger_pottery_pattern").sprite().atlas("decorated_pot"),
 			rule().exact(Material.BUBBLE_COLUMN).overwrite(MINECRAFT + "bubble").sprite().atlas("particles"),
 			rule().exact(Material.SHIELD).prepend(MINECRAFT + "container/slot/").sprite().atlas("gui"),
@@ -196,22 +198,22 @@ public class MaterialSpritesGenerator extends JavaPlugin {
 			rule().exact(Material.MANGROVE_LEAVES).prepend(BLOCK).sprite().color(TextColor.color(0x92c648)),
 			rule().exact(Material.SPRUCE_LEAVES).prepend(BLOCK).sprite().color(TextColor.color(0x619961)),
 			rule().exact(Material.BIRCH_LEAVES).prepend(BLOCK).sprite().color(TextColor.color(0x80a755)),
-			rule().prefix("leather_").prepend(ITEM).sprite().color(TextColor.color(Bukkit.getItemFactory().getDefaultLeatherColor().asRGB())),
+			rule().prefix("leather_").prepend(ITEM).sprite().atlas(ITEMS_ATLAS).color(TextColor.color(Bukkit.getItemFactory().getDefaultLeatherColor().asRGB())),
 
 			rule().suffix("_fence", true).prepend(BLOCK).append("_planks").sprite(),
 			rule().suffix("_shelf", true).prepend(BLOCK).append("_planks").sprite(),
 
-			rule().prepend(ITEM).sprite(),
-			rule().prepend(ITEM).append("_00").sprite(),
+			rule().prepend(ITEM).sprite().atlas(ITEMS_ATLAS),
+			rule().prepend(ITEM).append("_00").sprite().atlas(ITEMS_ATLAS),
 			rule().prepend(BLOCK).sprite(),
 			rule().prepend(BLOCK).append("_front").sprite(),
 			rule().prepend(BLOCK).append("_side").sprite(),
 			rule().prepend(BLOCK).append("_side0").sprite(),
 			rule().prepend(BLOCK).append("_stage3").sprite(),
 
-			rule().prefix("waxed_", true).prepend(ITEM).sprite(),
+			rule().prefix("waxed_", true).prepend(ITEM).sprite().atlas(ITEMS_ATLAS),
 			rule().prefix("waxed_", true).prepend(BLOCK).sprite(),
-			rule().prefix("potted_", true).prepend(ITEM).sprite(),
+			rule().prefix("potted_", true).prepend(ITEM).sprite().atlas(ITEMS_ATLAS),
 			rule().prefix("potted_", true).prepend(BLOCK).sprite(),
 			rule().prefix("infested_", true).prepend(BLOCK).sprite(),
 
@@ -239,14 +241,14 @@ public class MaterialSpritesGenerator extends JavaPlugin {
 			rule().suffix("_fence_gate", true).prepend(BLOCK).append("_planks").sprite(),
 			rule().suffix("_wood", true).prepend(BLOCK).append("_log").sprite(),
 			rule().suffix("_hyphae", true).prepend(BLOCK).append("_stem").sprite(),
-			rule().suffix("_cake", true).prepend(ITEM).sprite(),
+			rule().suffix("_cake", true).prepend(ITEM).sprite().atlas(ITEMS_ATLAS),
 			rule().suffix("_pane", true).prepend(BLOCK).sprite(),
 			rule().suffix("_carpet", true).prepend(BLOCK).append("_wool").sprite(),
 			rule().suffix("_bed", true).prepend(BLOCK).append("_wool").sprite(),
 
 			rule().suffix("wall_torch", true).prepend(BLOCK).append("torch").sprite(),
-			rule().suffix("_wall_sign", true).prepend(ITEM).append("_sign").sprite(),
-			rule().suffix("_wall_hanging_sign", true).prepend(ITEM).append("_hanging_sign").sprite(),
+			rule().suffix("_wall_sign", true).prepend(ITEM).append("_sign").sprite().atlas(ITEMS_ATLAS),
+			rule().suffix("_wall_hanging_sign", true).prepend(ITEM).append("_hanging_sign").sprite().atlas(ITEMS_ATLAS),
 			rule().suffix("_wall_fan", true).prepend(BLOCK).append("_fan").sprite(),
 
 			rule().prefix("waxed_", true).suffix("_slab", true).prepend(BLOCK).sprite(),
