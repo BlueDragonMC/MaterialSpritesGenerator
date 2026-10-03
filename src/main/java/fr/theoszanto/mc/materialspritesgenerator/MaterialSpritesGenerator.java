@@ -180,6 +180,7 @@ public class MaterialSpritesGenerator extends JavaPlugin {
 			rule().exact(Material.ENCHANTED_GOLDEN_APPLE).overwrite(ITEM + "golden_apple").sprite().atlas(ITEMS_ATLAS),
 			rule().exact(Material.TIPPED_ARROW).overwrite(ITEM + "arrow").sprite().atlas(ITEMS_ATLAS),
 			rule().exact(Material.BAMBOO_SAPLING).overwrite(BLOCK + "bamboo_stage0").sprite(),
+			rule().exact(Material.SHELF_MUSHROOM).prepend(BLOCK).append("_stage0").sprite(),
 			rule().exact(Material.DRIED_KELP_BLOCK).overwrite(BLOCK + "dried_kelp_side").sprite(),
 			rule().exact(Material.LECTERN).overwrite(BLOCK + "bookshelf").sprite(),
 			rule().either(Material.LAVA_CAULDRON, Material.POWDER_SNOW_CAULDRON, Material.WATER_CAULDRON).overwrite(ITEM + "cauldron").sprite().atlas(ITEMS_ATLAS),
