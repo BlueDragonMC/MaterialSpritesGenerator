@@ -1,0 +1,14 @@
+[settings]
+lockfile = true
+
+[tools]
+java = "25"
+maven = "3.9"
+
+[tasks.atlases]
+description = "Download a vanilla Minecraft client jar and regenerate the atlas sprite lists"
+usage = 'arg "<version>" help="Minecraft version to extract the atlases from, e.g. 26.3"'
+run = """
+mvn -q -f "{{config_root}}/atlas-generator/pom.xml" package
+java -jar "{{config_root}}/atlas-generator/target/atlas-generator.jar" ${usage_version} "{{config_root}}"
+"""

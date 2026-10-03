@@ -4,7 +4,7 @@ Generate mappings from PaperMC's Material to Minecraft sprite components.
 
 ## Download pre-generated mappings
 
-You can download pre-generated mappings for a specific Minecraft version from the [releases](https://github.com/indyteo/MaterialSpritesGenerator/releases).
+You can download pre-generated mappings for a specific Minecraft version from the [releases](https://github.com/BlueDragonMC/MaterialSpritesGenerator/releases).
 
 Some sprite names change across versions, new sprites are added for new materials, and existing sprites could be improved.
 Notable changes include the refactoring of item sprites from the `blocks` (default) atlas to their dedicated `items` atlas, in Minecraft 1.21.11.
@@ -17,6 +17,20 @@ Run a PaperMC server with the appropriate version and the installed plugin.
 You should get the generated mappings in the plugin's folder.
 
 You can also optionally customize the `config.yml` file to edit generation options, or the Java template file.
+
+## Regenerate atlas sprite lists
+
+The `src/main/resources/atlases/*.txt` files list the sprite keys available in each atlas for a given Minecraft version.
+They are what lets the mapping rules check that a generated sprite key actually exists.
+They are populated by the `atlas-generator` Maven subproject, which downloads the vanilla client jar, reads its atlas definitions, and writes the sprite lists.
+Run it from the repository root with the Mise task (which installs Java and Maven automatically):
+
+```sh
+mise run atlases <minecraft version>
+```
+
+For example, `mise run atlases 26.3`.
+The client jar is cached under `build/minecraft/` so subsequent runs are offline.
 
 ## Why is this needed?
 
