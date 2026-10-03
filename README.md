@@ -11,10 +11,17 @@ Notable changes include the refactoring of item sprites from the `blocks` (defau
 
 ## Generate mappings
 
-Clone the repository and build the JAR using Maven (be sure to checkout the tag corresponding to the version you're interested in so you get the correct mapping rules).
+The easiest way is the Mise task, which builds the plugin, downloads the latest Paper build for the requested Minecraft version, and runs it with the plugin installed:
 
-Run a PaperMC server with the appropriate version and the installed plugin.
-You should get the generated mappings in the plugin's folder.
+```sh
+mise run mappings <minecraft version>
+```
+
+The plugin is configured to stop the server as soon as it has written the mappings, so the task finishes on its own.
+The result is written to `build/paper/<minecraft version>/plugins/MaterialSpritesGenerator/MaterialSprites.java`.
+
+If you need a specific Paper build or a custom server setup, you can instead run a PaperMC server manually with the appropriate version and the installed plugin; you should get the generated mappings in the plugin's folder.
+In that case, be sure to build the JAR with Maven first (`mvn package`), and regenerate the atlas sprite lists below if you are targeting a different Minecraft version.
 
 You can also optionally customize the `config.yml` file to edit generation options, or the Java template file.
 
