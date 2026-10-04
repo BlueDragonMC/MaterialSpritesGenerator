@@ -1,43 +1,109 @@
 # MaterialSpritesGenerator
 
-Generate mappings from PaperMC's Material to Minecraft sprite components.
+Generate Minecraft sprite components for materials (items and blocks).
 
-## Download pre-generated mappings
+## Modules
 
-You can download pre-generated mappings for a specific Minecraft version from the [releases](https://github.com/BlueDragonMC/MaterialSpritesGenerator/releases).
+This is a multi-module Maven project.
+All artifacts are published under the `com.bluedragonmc.materialsprites` group.
 
-Some sprite names change across versions, new sprites are added for new materials, and existing sprites could be improved.
-Notable changes include the refactoring of item sprites from the `blocks` (default) atlas to their dedicated `items` atlas, in Minecraft 1.21.11.
+| Module                             | Description                                                                                   |
+|------------------------------------|-----------------------------------------------------------------------------------------------|
+| `material-sprites-generator`       | Paper plugin that runs the mapping rules and emits the raw, platform-independent mapping data |
+| `material-sprites-atlas-generator` | CLI that populates the atlas sprite lists from a vanilla Minecraft client jar                 |
+| `material-sprites-data`            | The raw mapping data, keyed by material name (for example `acacia_boat`)                      |
+| `material-sprites-paper`           | Paper runtime library: `Material` -> sprite `Component`                                       |
+| `material-sprites-minestom`        | Minestom runtime library: `Material` -> sprite `Component`                                    |
 
-## Generate mappings
+The platform libraries are published so downstream projects do not need to copy generated code around.
 
-The easiest way is the Mise task, which builds the plugin, downloads the latest Paper build for the requested Minecraft version, and runs it with the plugin installed:
+## Consuming the mappings
 
-```sh
-mise run mappings <minecraft version>
+![Latest version](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Freposilite.bluedragonmc.com%2Freleases%2Fcom%2Fbluedragonmc%2Fmaterialsprites%2Fmaterial-sprites-minestom%2Fmaven-metadata.xml&query=%2Fmetadata%2Fversioning%2Flatest&label=Latest%20Version)
+
+Add the BlueDragon Maven repository and one of the platform libraries:
+
+```xml
+<repositories>
+	<repository>
+		<id>reposilite</id>
+		<url>https://reposilite.bluedragonmc.com/releases</url>
+	</repository>
+</repositories>
 ```
 
-The plugin is configured to stop the server as soon as it has written the mappings, so the task finishes on its own.
-The result is written to `build/paper/<minecraft version>/plugins/MaterialSpritesGenerator/MaterialSprites.java`.
+```xml
+<dependency>
+	<groupId>com.bluedragonmc.materialsprites</groupId>
+	<artifactId>material-sprites-minestom</artifactId>
+	<version>2026-10-03-abcdef0</version> <!-- Use the latest version from the badge above -->
+</dependency>
+```
 
-If you need a specific Paper build or a custom server setup, you can instead run a PaperMC server manually with the appropriate version and the installed plugin; you should get the generated mappings in the plugin's folder.
-In that case, be sure to build the JAR with Maven first (`mvn package`), and regenerate the atlas sprite lists below if you are targeting a different Minecraft version.
+Artifacts are released with the version `<date>-<short commit hash>`; there are no snapshot releases.
 
-You can also optionally customize the `config.yml` file to edit generation options, or the Java template file.
+Then resolve a sprite for any material:
 
-## Regenerate atlas sprite lists
+```java
+Component sprite = MaterialSprites.get(material);
+```
 
-The `src/main/resources/atlases/*.txt` files list the sprite keys available in each atlas for a given Minecraft version.
+`MaterialSprites.get(...)` returns an invisible placeholder component for materials with no sprite.
+
+## Building
+
+```sh
+mise run build
+```
+
+Or, with Maven directly:
+
+```sh
+mvn install
+```
+
+## Generating the data
+
+Both tasks install Java and Maven automatically through [Mise](https://mise.jdx.dev/).
+
+### 1. Atlas sprite lists
+
+The `plugin/src/main/resources/atlases/*.txt` files list the sprite keys available in each atlas for a given Minecraft version.
 They are what lets the mapping rules check that a generated sprite key actually exists.
-They are populated by the `atlas-generator` Maven subproject, which downloads the vanilla client jar, reads its atlas definitions, and writes the sprite lists.
-Run it from the repository root with the Mise task (which installs Java and Maven automatically):
+Regenerate them from the vanilla client jar (cached under `build/minecraft/`):
 
 ```sh
 mise run atlases <minecraft version>
 ```
 
 For example, `mise run atlases 26.3`.
-The client jar is cached under `build/minecraft/` so subsequent runs are offline.
+
+### 2. Mapping data
+
+Run a Paper server with the built plugin to apply the mapping rules and write the raw data:
+
+```sh
+mise run mappings <minecraft version>
+```
+
+For example, `mise run mappings 26.3`.
+The plugin stops the server as soon as it has written the data, which is then copied into `data/src/main/resources/material-sprites.json`.
+After regenerating the data, rebuild (and publish) the modules so the platform libraries pick it up.
+
+If you need a specific Paper build or a custom server setup, you can also run a PaperMC server manually with the appropriate version and the installed plugin; the data will be written to the plugin's folder.
+
+### Publishing
+
+Releases use the version `<date>-<short commit hash>` (for example `2026-10-03-abcdef0`), computed from `git` when publishing.
+There are no snapshot releases; everything is published to the `releases` repository.
+
+```sh
+mise run publish
+```
+
+This runs `mvn deploy` with a computed `-Drevision`, publishing to the BlueDragon [reposilite](https://reposilite.bluedragonmc.com/releases) repository.
+Credentials are read from the `reposilite` server entry in your Maven `settings.xml`.
+In CI, [`.github/workflows/publish.yml`](.github/workflows/publish.yml) does this automatically on pushes to `master`.
 
 ## Why is this needed?
 
@@ -45,10 +111,11 @@ Naive approaches like using the material name or ID as a sprite key won't work f
 Sprites are defined from atlases, which are automatically generated by the game based on textures in the resource pack.
 You can visualize them by saving debug textures using `F3 + S` in-game.
 
-This project relies on manually written mappings, that are used to transform material IDs and check for the existence of a sprite with that transformed key.
-You can help improve the results either by improving the mapping rules, or add "exceptions", which are basically exact matching rules to handle one or a few given materials only.
-Some materials don't have any sprite available, because the game does not provide them. Such materials were assigned manually selected head textures for completeness.
+The mapping rules transform material IDs and check for the existence of a sprite with that transformed key.
+You can help improve the results either by improving the mapping rules, or by adding "exceptions", which are exact matching rules to handle one or a few given materials only.
+Some materials don't have any sprite available, because the game does not provide one; such materials were assigned manually selected head textures for completeness.
 
 ## License
 
 This project is licensed under the terms of the [MIT](LICENSE.txt) license.
+It is a fork of [indyteo/MaterialSpritesGenerator](https://github.com/indyteo/MaterialSpritesGenerator).

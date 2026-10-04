@@ -1,0 +1,9 @@
+name: MaterialSpritesGenerator
+version: "${project.version}"
+main: com.bluedragonmc.materialsprites.generator.MaterialSpritesGenerator
+api-version: "26.3"
+authors: [indyteo, BlueDragonMC]
+commands:
+  sprites:
+    aliases: [ sprite ]
+    description: "Show sprites"

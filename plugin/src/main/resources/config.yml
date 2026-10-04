@@ -1,0 +1,9 @@
+output: material-sprites.json
+stop-server-after-generation: true
+atlases:
+  - blocks
+  - decorated_pot
+  - gui
+  - items
+  - map_decorations
+  - particles

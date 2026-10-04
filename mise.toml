@@ -6,6 +6,10 @@ java = "25"
 maven = "3.9"
 jq = "latest"
 
+[tasks.build]
+description = "Build every module"
+run = 'mvn -q -f "{{config_root}}/pom.xml" package'
+
 [tasks.atlases]
 description = "Download a vanilla Minecraft client jar and regenerate the atlas sprite lists"
 usage = 'arg "<version>" help="Minecraft version to extract the atlases from, e.g. 26.3"'
@@ -15,9 +19,17 @@ java -jar "{{config_root}}/atlas-generator/target/atlas-generator.jar" ${usage_v
 """
 
 [tasks.mappings]
-description = "Run a Paper server with the built plugin to generate the MaterialSprites mappings"
+description = "Run a Paper server with the built plugin to generate the material sprite data"
 usage = 'arg "<version>" help="Minecraft/Paper version to run, e.g. 26.3"'
 run = """
-mvn -q -f "{{config_root}}/pom.xml" package
+mvn -q -f "{{config_root}}/plugin/pom.xml" package
 bash "{{config_root}}/scripts/run-paper.sh" ${usage_version}
+"""
+
+[tasks.publish]
+description = "Publish every module to the BlueDragon Maven repository"
+run = """
+VERSION="$(date +%Y-%m-%d)-$(git rev-parse --short=7 HEAD)"
+echo "Publishing version $VERSION"
+mvn -q -f "{{config_root}}/pom.xml" -Drevision="$VERSION" deploy
 """

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.bluedragonmc.materialsprites</groupId>
+		<artifactId>material-sprites</artifactId>
+		<version>${revision}</version>
+	</parent>
+
+	<artifactId>material-sprites-minestom</artifactId>
+	<name>Material Sprites Minestom</name>
+	<description>Minestom Material to sprite component mappings</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.bluedragonmc.materialsprites</groupId>
+			<artifactId>material-sprites-data</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.minestom</groupId>
+			<artifactId>minestom</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+</project>

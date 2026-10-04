@@ -4,49 +4,33 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>fr.theoszanto.mc</groupId>
-	<artifactId>MaterialSpritesGenerator</artifactId>
-	<version>1.1-SNAPSHOT</version>
+	<groupId>com.bluedragonmc.materialsprites</groupId>
+	<artifactId>material-sprites</artifactId>
+	<version>${revision}</version>
+	<packaging>pom</packaging>
+
+	<name>Material Sprites</name>
+	<description>Minecraft material to sprite component mappings</description>
+
+	<modules>
+		<module>plugin</module>
+		<module>atlas-generator</module>
+		<module>data</module>
+		<module>paper</module>
+		<module>minestom</module>
+	</modules>
 
 	<properties>
+		<!-- Overridden at publish time with `<date>-<short commit>`. -->
+		<revision>dev</revision>
 		<java.version>25</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- The Minecraft version whose data is currently bundled in material-sprites-data. -->
+		<minecraft.version>26.3</minecraft.version>
+		<paper.version>26.3.build.147-beta</paper.version>
+		<minestom.version>26_3-SNAPSHOT</minestom.version>
+		<gson.version>2.14.0</gson.version>
 	</properties>
-
-	<build>
-		<finalName>MaterialSpritesGenerator</finalName>
-		<defaultGoal>clean package</defaultGoal>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.13.0</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.6.0</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-	</build>
 
 	<repositories>
 		<repository>
@@ -54,17 +38,95 @@
 			<url>https://repo.papermc.io/repository/maven-public/</url>
 		</repository>
 		<repository>
-			<id>sonatype</id>
-			<url>https://oss.sonatype.org/content/groups/public/</url>
+			<id>sonatype-snapshots</id>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 
-	<dependencies>
-		<dependency>
-			<groupId>io.papermc.paper</groupId>
-			<artifactId>paper-api</artifactId>
-			<version>26.3.build.147-beta</version>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.bluedragonmc.materialsprites</groupId>
+				<artifactId>material-sprites-data</artifactId>
+				<version>${revision}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.papermc.paper</groupId>
+				<artifactId>paper-api</artifactId>
+				<version>${paper.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.minestom</groupId>
+				<artifactId>minestom</artifactId>
+				<version>${minestom.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>${gson.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.13.0</version>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>3.6.0</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<!-- Resolves ${revision} in the published POMs while keeping the source POMs generic. -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<configuration>
+					<updatePomFile>true</updatePomFile>
+					<flattenMode>resolveCiFriendliesOnly</flattenMode>
+				</configuration>
+				<executions>
+					<execution>
+						<id>flatten</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>flatten</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>flatten.clean</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<distributionManagement>
+		<repository>
+			<id>reposilite</id>
+			<url>https://reposilite.bluedragonmc.com/releases</url>
+		</repository>
+	</distributionManagement>
 </project>
