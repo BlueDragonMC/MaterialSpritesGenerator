@@ -9,7 +9,11 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="${1:?usage: run-paper.sh <minecraft version>}"
+VERSION="${1:-${MINECRAFT_VERSION:-}}"
+if [[ -z "$VERSION" ]]; then
+	echo "usage: run-paper.sh <minecraft version> (or set MINECRAFT_VERSION)" >&2
+	exit 2
+fi
 
 PLUGIN_JAR="$ROOT/plugin/target/MaterialSpritesGenerator.jar"
 SERVER_DIR="$ROOT/build/paper/$VERSION"

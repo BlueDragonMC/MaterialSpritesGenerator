@@ -1,0 +1,36 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master, main]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v6
+      - name: Setup Mise
+        uses: jdx/mise-action@v4
+        with:
+          version: "2026.9.18"
+      - name: Configure repository credentials
+        env:
+          REPOSILITE_USERNAME: ${{ secrets.REPOSILITE_USERNAME }}
+          REPOSILITE_TOKEN: ${{ secrets.REPOSILITE_TOKEN }}
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>reposilite</id>
+                <username>$REPOSILITE_USERNAME</username>
+                <password>$REPOSILITE_TOKEN</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+      - name: Generate and publish
+        run: mise run publish

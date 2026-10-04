@@ -1,7 +1,7 @@
 name: MaterialSpritesGenerator
 version: "${project.version}"
 main: com.bluedragonmc.materialsprites.generator.MaterialSpritesGenerator
-api-version: "26.3"
+api-version: "${minecraft.version}"
 authors: [indyteo, BlueDragonMC]
 commands:
   sprites:

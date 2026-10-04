@@ -52,58 +52,49 @@ Component sprite = MaterialSprites.get(material);
 
 ## Building
 
+In this project, we use [Mise](https://mise.jdx.dev) to manage toolchains and tasks.
+
+Compile every module using this command:
+
 ```sh
 mise run build
 ```
 
-Or, with Maven directly:
-
-```sh
-mvn install
-```
+The `build` task will automatically generate the required data (see below) before compiling.
 
 ## Generating the data
 
-Both tasks install Java and Maven automatically through [Mise](https://mise.jdx.dev/).
-
-### 1. Atlas sprite lists
-
-The `plugin/src/main/resources/atlases/*.txt` files list the sprite keys available in each atlas for a given Minecraft version.
-They are what lets the mapping rules check that a generated sprite key actually exists.
-Regenerate them from the vanilla client jar (cached under `build/minecraft/`):
+This command downloads the client JAR, extracts the atlas entries, and runs
+a Paper server with the generator plugin to generate the sprite mappings: 
 
 ```sh
-mise run atlases <minecraft version>
+mise run generate
 ```
 
-For example, `mise run atlases 26.3`.
+To add a new Minecraft version, update `MINECRAFT_VERSION`, `PAPER_VERSION` and `MINESTOM_VERSION` in `mise.toml`, e.g.:
 
-### 2. Mapping data
-
-Run a Paper server with the built plugin to apply the mapping rules and write the raw data:
-
-```sh
-mise run mappings <minecraft version>
+```toml
+# mise.toml
+[env]
+MINECRAFT_VERSION = "26.3"
+PAPER_VERSION = "26.3.build.147-beta"
+MINESTOM_VERSION = "26_3-SNAPSHOT"
 ```
 
-For example, `mise run mappings 26.3`.
-The plugin stops the server as soon as it has written the data, which is then copied into `data/src/main/resources/material-sprites.json`.
-After regenerating the data, rebuild (and publish) the modules so the platform libraries pick it up.
+Then, run `mise run generate` again.
 
-If you need a specific Paper build or a custom server setup, you can also run a PaperMC server manually with the appropriate version and the installed plugin; the data will be written to the plugin's folder.
+## Publishing
 
-### Publishing
-
-Releases use the version `<date>-<short commit hash>` (for example `2026-10-03-abcdef0`), computed from `git` when publishing.
-There are no snapshot releases; everything is published to the `releases` repository.
+Releases use the version `<date>-<short commit hash>` (for example `2026-10-03-abcdef0`).
 
 ```sh
 mise run publish
 ```
 
-This runs `mvn deploy` with a computed `-Drevision`, publishing to the BlueDragon [reposilite](https://reposilite.bluedragonmc.com/releases) repository.
+This regenerates the generated files, then runs `mvn deploy` with a computed `-Drevision`, publishing to the BlueDragon [reposilite](https://reposilite.bluedragonmc.com/releases) repository.
 Credentials are read from the `reposilite` server entry in your Maven `settings.xml`.
-In CI, [`.github/workflows/publish.yml`](.github/workflows/publish.yml) does this automatically on pushes to `master`.
+
+In CI, [`.github/workflows/publish.yml`](.github/workflows/publish.yml) runs this automatically on every push to `master`.
 
 ## Why is this needed?
 
