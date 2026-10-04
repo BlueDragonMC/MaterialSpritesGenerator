@@ -32,5 +32,5 @@ jobs:
             </servers>
           </settings>
           EOF
-      - name: Generate and publish
+      - name: Generate, test, and publish
         run: mise run publish

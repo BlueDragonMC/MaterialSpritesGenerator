@@ -30,14 +30,23 @@ bash "{{config_root}}/scripts/run-paper.sh"
 description = "Regenerate the atlas sprite lists and the material sprite data"
 depends = ["mappings"]
 
+[tasks.test]
+description = "Run the module tests"
+depends = ["generate"]
+run = 'mvn -q -f "{{config_root}}/pom.xml" -Dminecraft.version="$MINECRAFT_VERSION" -Dpaper.version="$PAPER_VERSION" -Dminestom.version="$MINESTOM_VERSION" test'
+
+[tasks.check]
+description = "Generate the data and run the module tests"
+depends = ["test"]
+
 [tasks.build]
 description = "Generate the data and build every module"
-depends = ["generate"]
+depends = ["test"]
 run = 'mvn -q -f "{{config_root}}/pom.xml" -Dminecraft.version="$MINECRAFT_VERSION" -Dpaper.version="$PAPER_VERSION" -Dminestom.version="$MINESTOM_VERSION" package'
 
 [tasks.publish]
-description = "Generate the data and publish every module to the BlueDragon Maven repository"
-depends = ["generate"]
+description = "Generate the data, run the tests and publish every module to the BlueDragon Maven repository"
+depends = ["test"]
 run = """
 VERSION="$(date +%Y-%m-%d)-$(git rev-parse --short=7 HEAD)"
 echo "Publishing version $VERSION"

@@ -62,6 +62,15 @@ mise run build
 
 The `build` task will automatically generate the required data (see below) before compiling.
 
+Run the module tests (this also generates the data first):
+
+```sh
+mise run check
+```
+
+The [Minestom module](minestom) tests iterate over every Minestom material and assert that
+only `air` has no sprite. This runs on every push in CI before publishing.
+
 ## Generating the data
 
 This command downloads the client JAR, extracts the atlas entries, and runs

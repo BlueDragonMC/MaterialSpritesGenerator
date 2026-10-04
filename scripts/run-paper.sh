@@ -47,11 +47,18 @@ cp "$PLUGIN_JAR" "$SERVER_DIR/plugins/MaterialSpritesGenerator.jar"
 echo "Starting Paper $VERSION (this can take a moment on the first run)..."
 cd "$SERVER_DIR"
 set +e
-timeout 300 java -Xmx1G -jar paper.jar --nogui > "$SERVER_DIR/console.log" 2>&1
+timeout --foreground 300 java -Xmx1G -jar paper.jar --nogui > "$SERVER_DIR/console.log" 2>&1
 STATUS=$?
 set -e
 
 grep -E "\[MaterialSpritesGenerator\]" "$SERVER_DIR/console.log" || true
+
+# A timeout kills the process with 124; anything else is a normal exit.
+if [[ "$STATUS" -eq 124 ]]; then
+	echo "Paper timed out after 300s. It was last doing:" >&2
+	tail -n 20 "$SERVER_DIR/console.log" >&2
+	exit 1
+fi
 
 if [[ ! -s "$GENERATED" ]]; then
 	echo "Mapping generation failed (server exit code $STATUS). Last log lines:" >&2
