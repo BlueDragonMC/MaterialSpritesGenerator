@@ -19,7 +19,7 @@ The platform libraries are published so downstream projects do not need to copy 
 
 ## Consuming the mappings
 
-![Latest version](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Freposilite.bluedragonmc.com%2Freleases%2Fcom%2Fbluedragonmc%2Fmaterialsprites%2Fmaterial-sprites-minestom%2Fmaven-metadata.xml&query=%2Fmetadata%2Fversioning%2Flatest&label=Latest%20Version)
+![Latest version](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Freposilite.bluedragonmc.com%2Freleases%2Fcom%2Fbluedragonmc%2Fmaterialsprites%2Fmaterial-sprites-minestom%2Fmaven-metadata.xml&query=%2Fmetadata%2Fversioning%2Frelease&label=Latest%20Version)
 
 Add the BlueDragon Maven repository and one of the platform libraries:
 
