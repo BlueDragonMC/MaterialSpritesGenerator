@@ -90,6 +90,12 @@ public final class GenerateAtlases {
 	}
 
 	private static Path downloadClient(HttpClient http, String version, Path cacheDir) throws Exception {
+		Path cache = cacheDir.resolve("client-" + version + ".jar");
+		if (isValidZip(cache)) {
+			System.out.println("Using cached client jar");
+			return cache;
+		}
+
 		JsonObject manifest = JsonParser.parseString(get(http, VERSION_MANIFEST)).getAsJsonObject();
 		String versionUrl = null;
 		for (JsonElement entry : manifest.getAsJsonArray("versions")) {
@@ -105,11 +111,6 @@ public final class GenerateAtlases {
 		String clientUrl = JsonParser.parseString(get(http, versionUrl)).getAsJsonObject()
 				.getAsJsonObject("downloads").getAsJsonObject("client").get("url").getAsString();
 
-		Path cache = cacheDir.resolve("client-" + version + ".jar");
-		if (isValidZip(cache)) {
-			System.out.println("Using cached client jar");
-			return cache;
-		}
 		Files.createDirectories(cacheDir);
 		Files.deleteIfExists(cache);
 		System.out.println("Downloading client jar from " + clientUrl);
