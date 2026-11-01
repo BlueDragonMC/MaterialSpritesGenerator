@@ -1,0 +1,6 @@
+blocks
+decorated_pot
+gui
+items
+map_decorations
+particles
