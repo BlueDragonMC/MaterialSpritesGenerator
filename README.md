@@ -7,13 +7,13 @@ Generate Minecraft sprite components for materials (items and blocks).
 This is a multi-module Maven project.
 All artifacts are published under the `com.bluedragonmc.materialsprites` group.
 
-| Module                             | Description                                                                                   |
-|------------------------------------|-----------------------------------------------------------------------------------------------|
-| `material-sprites-generator`       | Paper plugin that runs the mapping rules and emits the raw, platform-independent mapping data |
-| `material-sprites-atlas-generator` | CLI that populates the atlas sprite lists from a vanilla Minecraft client jar                 |
-| `material-sprites-data`            | The raw mapping data, keyed by material name (for example `acacia_boat`)                      |
-| `material-sprites-paper`           | Paper runtime library: `Material` -> sprite `Component`                                       |
-| `material-sprites-minestom`        | Minestom runtime library: `Material` -> sprite `Component`                                    |
+| Module                             | Description                                                                                     |
+|------------------------------------|-------------------------------------------------------------------------------------------------|
+| `material-sprites-generator`       | CLI that runs the mapping rules and emits the raw, platform-independent mapping data            |
+| `material-sprites-atlas-generator` | CLI that extracts the atlas sprite lists and material names from a vanilla Minecraft client jar |
+| `material-sprites-data`            | The raw mapping data, keyed by material name (for example `acacia_boat`)                        |
+| `material-sprites-paper`           | Paper runtime library: `Material` -> sprite `Component`                                         |
+| `material-sprites-minestom`        | Minestom runtime library: `Material` -> sprite `Component`                                      |
 
 The platform libraries are published so downstream projects do not need to copy generated code around.
 
@@ -73,21 +73,26 @@ only `air` has no sprite. This runs on every push in CI before publishing.
 
 ## Generating the data
 
-This command downloads the client JAR, extracts the atlas entries, and runs
-a Paper server with the generator plugin to generate the sprite mappings: 
+This command downloads the client JAR, extracts the atlas sprite lists and the
+item/block names, then runs the generator CLI to write the sprite mappings:
 
 ```sh
 mise run generate
 ```
 
-To add a new Minecraft version, update `MINECRAFT_VERSION`, `PAPER_VERSION` and `MINESTOM_VERSION` in `mise.toml`, e.g.:
+To update the Minecraft version, edit `MINECRAFT_VERSION` in `mise.toml` and the
+`paper.version` / `minestom.version` properties in the root `pom.xml`, e.g.:
 
 ```toml
 # mise.toml
 [env]
 MINECRAFT_VERSION = "26.3"
-PAPER_VERSION = "26.3.build.147-beta"
-MINESTOM_VERSION = "26_3-SNAPSHOT"
+```
+
+```xml
+<!-- pom.xml -->
+<paper.version>26.3.build.147-beta</paper.version>
+<minestom.version>26_3-SNAPSHOT</minestom.version>
 ```
 
 Then, run `mise run generate` again.

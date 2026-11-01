@@ -13,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
@@ -23,10 +22,16 @@ import java.util.zip.ZipFile;
 
 /**
  * Downloads a vanilla Minecraft client jar and regenerates the generator's
- * atlas sprite lists, which are used to validate that a generated sprite key
- * actually exists in a given atlas.
+ * inputs:
+ * <ul>
+ *     <li>the atlas sprite lists, used to validate that a generated sprite key
+ *     actually exists in a given atlas;</li>
+ *     <li>the material names, read from the client's item and blockstate
+ *     definitions.</li>
+ * </ul>
  *
- * Each atlas text file is a plain list of sprite keys, one per line.
+ * Each atlas text file is a plain list of sprite keys, one per line. The
+ * materials file is a plain list of material names, one per line.
  *
  * Usage: {@code java -jar atlas-generator.jar <minecraft version> [project root]}
  */
@@ -35,6 +40,8 @@ public final class GenerateAtlases {
 			"https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 	private static final String TEXTURE_PREFIX = "assets/minecraft/textures/";
 	private static final String ATLAS_PREFIX = "assets/minecraft/atlases/";
+	private static final String ITEM_DEFINITIONS_PREFIX = "assets/minecraft/items/";
+	private static final String BLOCKSTATE_PREFIX = "assets/minecraft/blockstates/";
 
 	public static void main(String[] args) throws Exception {
 		if (args.length < 1) {
@@ -43,9 +50,10 @@ public final class GenerateAtlases {
 		}
 		String version = args[0];
 		Path root = Paths.get(args.length > 1 ? args[1] : ".");
-		Path config = root.resolve("plugin/src/main/resources/config.yml");
-		Path outputDir = root.resolve("plugin/src/main/resources/atlases");
-		List<String> atlases = readAtlasNames(config);
+		Path atlasIndex = root.resolve("generator/src/main/resources/atlases.txt");
+		Path outputDir = root.resolve("generator/src/main/resources/atlases");
+		Path materialsOutput = root.resolve("generator/src/main/resources/materials.txt");
+		List<String> atlases = readAtlasNames(atlasIndex);
 
 		HttpClient http = HttpClient.newBuilder()
 				.followRedirects(HttpClient.Redirect.NORMAL)
@@ -63,28 +71,21 @@ public final class GenerateAtlases {
 				Files.write(output, String.join("\n", sprites).concat("\n").getBytes(StandardCharsets.UTF_8));
 				System.out.println("Wrote " + sprites.size() + " sprites to " + output);
 			}
+
+			Set<String> materials = collectMaterials(zip);
+			Files.write(materialsOutput, String.join("\n", materials).concat("\n").getBytes(StandardCharsets.UTF_8));
+			System.out.println("Wrote " + materials.size() + " materials to " + materialsOutput);
 		}
 	}
 
-	/** Reads the {@code atlases} list from the generator configuration. */
-	private static List<String> readAtlasNames(Path config) throws IOException {
-		List<String> names = new ArrayList<>();
-		boolean inAtlases = false;
-		for (String line : Files.readAllLines(config, StandardCharsets.UTF_8)) {
-			if (line.startsWith("atlases:")) {
-				inAtlases = true;
-				continue;
-			}
-			if (!inAtlases)
-				continue;
-			String trimmed = line.trim();
-			if (trimmed.startsWith("- "))
-				names.add(trimmed.substring(2).trim());
-			else if (!trimmed.isEmpty() && !trimmed.startsWith("#"))
-				break;
-		}
+	/** Reads the atlas names from the plain-text index file, one name per line. */
+	private static List<String> readAtlasNames(Path index) throws IOException {
+		List<String> names = Files.readAllLines(index, StandardCharsets.UTF_8).stream()
+				.map(String::trim)
+				.filter(line -> !line.isEmpty() && !line.startsWith("#"))
+				.toList();
 		if (names.isEmpty())
-			throw new IOException("No atlases found in " + config.toAbsolutePath());
+			throw new IOException("No atlases listed in " + index.toAbsolutePath());
 		return names;
 	}
 
@@ -151,6 +152,34 @@ public final class GenerateAtlases {
 				textures.add(name.substring(TEXTURE_PREFIX.length(), name.length() - ".png".length()));
 		}
 		return textures;
+	}
+
+	/**
+	 * Collects every item and block name from the client jar.
+	 * <p>
+	 * Item model definitions ({@code assets/minecraft/items/}) and blockstate
+	 * definitions ({@code assets/minecraft/blockstates/}) each contain one file
+	 * per registry entry, so their file names are the material names used by the
+	 * game.
+	 */
+	private static TreeSet<String> collectMaterials(ZipFile zip) throws IOException {
+		TreeSet<String> materials = new TreeSet<>();
+		collectNames(zip, ITEM_DEFINITIONS_PREFIX, materials);
+		collectNames(zip, BLOCKSTATE_PREFIX, materials);
+		if (materials.isEmpty())
+			throw new IOException("No item or blockstate definitions found in the client jar; "
+					+ "the atlas generator requires a Minecraft version with data-driven item definitions (1.21.4+)");
+		return materials;
+	}
+
+	private static void collectNames(ZipFile zip, String prefix, Set<String> output) {
+		Enumeration<? extends ZipEntry> entries = zip.entries();
+		while (entries.hasMoreElements()) {
+			ZipEntry entry = entries.nextElement();
+			String name = entry.getName();
+			if (!entry.isDirectory() && name.startsWith(prefix) && name.endsWith(".json"))
+				output.add(name.substring(prefix.length(), name.length() - ".json".length()));
+		}
 	}
 
 	/** Resolves all sprite keys produced by an atlas definition. */

@@ -1,24 +1,16 @@
 package com.bluedragonmc.materialsprites.generator.rules;
 
 import com.google.gson.JsonObject;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public interface MappingRule {
 	boolean matches(String name);
 
-	String componentCode(String name);
-
 	JsonObject componentData(String name);
-
-	Component component(String name);
 
 	@Contract(pure = true)
 	static MappingRule.Abstract rule() {
@@ -51,18 +43,13 @@ public interface MappingRule {
 		}
 
 		@Contract(value = "_ -> new", pure = true)
-		default MappingRule.Abstract exact(Material exact) {
-			return this.exact(exact.key().value());
-		}
-
-		@Contract(value = "_ -> new", pure = true)
 		default MappingRule.Abstract exact(String exact) {
 			return new ExactMappingRule(this, exact);
 		}
 
 		@Contract(value = "_ -> new", pure = true)
-		default MappingRule.Abstract either(Material... either) {
-			return this.regex(Arrays.stream(either).map(m -> m.key().value()).collect(Collectors.joining("|")));
+		default MappingRule.Abstract either(String... either) {
+			return this.regex(String.join("|", either));
 		}
 
 		@Contract(value = "_ -> new", pure = true)

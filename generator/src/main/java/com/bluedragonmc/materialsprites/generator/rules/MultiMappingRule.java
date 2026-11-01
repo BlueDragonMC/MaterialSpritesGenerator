@@ -1,7 +1,6 @@
 package com.bluedragonmc.materialsprites.generator.rules;
 
 import com.google.gson.JsonObject;
-import net.kyori.adventure.text.Component;
 
 import java.util.List;
 import java.util.function.Function;
@@ -19,26 +18,10 @@ public final class MultiMappingRule implements MappingRule {
 	}
 
 	@Override
-	public String componentCode(String name) {
-		for (MappingRule rule : this.rules)
-			if (rule.matches(name))
-				return rule.componentCode(name);
-		throw new IllegalStateException(); // Impossible if #matches() returned true
-	}
-
-	@Override
 	public JsonObject componentData(String name) {
 		for (MappingRule rule : this.rules)
 			if (rule.matches(name))
 				return rule.componentData(name);
-		throw new IllegalStateException(); // Impossible if #matches() returned true
-	}
-
-	@Override
-	public Component component(String name) {
-		for (MappingRule rule : this.rules)
-			if (rule.matches(name))
-				return rule.component(name);
 		throw new IllegalStateException(); // Impossible if #matches() returned true
 	}
 }

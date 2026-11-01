@@ -3,8 +3,6 @@ lockfile = true
 
 [env]
 MINECRAFT_VERSION = "26.3"
-PAPER_VERSION = "26.3.build.147-beta"
-MINESTOM_VERSION = "26_3-SNAPSHOT"
 
 [tools]
 java = "25"
@@ -12,18 +10,18 @@ maven = "3.9"
 jq = "latest"
 
 [tasks.atlases]
-description = "Download the Minecraft client jar and regenerate the atlas sprite lists"
+description = "Download the Minecraft client jar and regenerate the atlas sprite lists and material names"
 run = """
 mvn -q -f "{{config_root}}/atlas-generator/pom.xml" package
 java -jar "{{config_root}}/atlas-generator/target/atlas-generator.jar" "$MINECRAFT_VERSION" "{{config_root}}"
 """
 
 [tasks.mappings]
-description = "Run Paper with the built plugin to generate the material sprite data"
+description = "Run the generator CLI to write the material sprite data"
 depends = ["atlases"]
 run = """
-mvn -q -f "{{config_root}}/plugin/pom.xml" -Dminecraft.version="$MINECRAFT_VERSION" -Dpaper.version="$PAPER_VERSION" package
-bash "{{config_root}}/scripts/run-paper.sh"
+mvn -q -f "{{config_root}}/generator/pom.xml" package
+java -jar "{{config_root}}/generator/target/MaterialSpritesGenerator.jar" "{{config_root}}/data/src/main/resources/material-sprites.json"
 """
 
 [tasks.generate]
@@ -33,7 +31,7 @@ depends = ["mappings"]
 [tasks.test]
 description = "Run the module tests"
 depends = ["generate"]
-run = 'mvn -q -f "{{config_root}}/pom.xml" -Dminecraft.version="$MINECRAFT_VERSION" -Dpaper.version="$PAPER_VERSION" -Dminestom.version="$MINESTOM_VERSION" test'
+run = 'mvn -q -f "{{config_root}}/pom.xml" test'
 
 [tasks.check]
 description = "Generate the data and run the module tests"
@@ -42,7 +40,7 @@ depends = ["test"]
 [tasks.build]
 description = "Generate the data and build every module"
 depends = ["test"]
-run = 'mvn -q -f "{{config_root}}/pom.xml" -Dminecraft.version="$MINECRAFT_VERSION" -Dpaper.version="$PAPER_VERSION" -Dminestom.version="$MINESTOM_VERSION" package'
+run = 'mvn -q -f "{{config_root}}/pom.xml" package'
 
 [tasks.publish]
 description = "Generate the data, run the tests and publish every module to the BlueDragon Maven repository"
@@ -50,5 +48,5 @@ depends = ["test"]
 run = """
 VERSION="$(date +%Y-%m-%d)-$(git rev-parse --short=7 HEAD)"
 echo "Publishing version $VERSION"
-mvn -q -f "{{config_root}}/pom.xml" -Dminecraft.version="$MINECRAFT_VERSION" -Dpaper.version="$PAPER_VERSION" -Dminestom.version="$MINESTOM_VERSION" -Drevision="$VERSION" deploy
+mvn -q -f "{{config_root}}/pom.xml" -Drevision="$VERSION" deploy
 """
